@@ -1,8 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
 import sqlite3
 import os
-
-from io import BytesIO
 from semantic_search import SemanticSearch
 import cloudinary
 

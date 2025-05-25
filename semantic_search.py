@@ -6,7 +6,6 @@ import os
 import re
 from typing import List, Dict, Tuple
 from flask import jsonify
-import requests
 import gdown
 
 
