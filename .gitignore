@@ -1,4 +1,5 @@
 __pycache__/
+.idea/
 *.pyc
 *.pyo
 *.pkl
@@ -22,3 +23,5 @@ venv/
 cache/
 __cache__/
 *.db
+.venv/
+uploads/
