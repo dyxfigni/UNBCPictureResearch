@@ -16,7 +16,7 @@ class SemanticSearch:
         try:
 
             print("Loading SentenceTransformer model...")
-            self.model = SentenceTransformer('all-MiniLM-L6-v2')
+            self.model = SentenceTransformer('all-MiniLM-L12-v1')
             print("Model loaded.")
             self.embeddings_cache = {}
             self.meta_cache = {}  # Кэш для метаданных (например, file_date)
