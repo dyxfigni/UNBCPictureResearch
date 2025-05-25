@@ -22,6 +22,5 @@ venv/
 .env.*
 cache/
 __cache__/
-*.db
 .venv/
 uploads/
