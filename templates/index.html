@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Search App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --secondary-color: #1976D2;
+            --background-color: #f5f5f5;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --hover-color: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 500;
+        }
+
+        .search-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 500;
+            color: #666;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: var(--hover-color);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 0 5px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--primary-color);
+            background-color: #e3f2fd;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background-color: #bbdefb;
+            color: var(--secondary-color);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2em;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Существующие стили для модальных окон */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            margin: 5% auto;
+            padding: 25px;
+            border: none;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-title {
+            margin: 0;
+            color: #333;
+            font-size: 24px;
+        }
+
+        .close, .close-photo {
+            color: #666;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+        }
+
+        .close:hover, .close-photo:hover {
+            color: #000;
+        }
+
+        #modalTextContent {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Image Search App</h1>
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="keywordSearch" placeholder="Search by keywords...">
+                <button onclick="performKeywordSearch()">Regular search</button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="semanticSearch" placeholder="Search with AI...">
+                <button onclick="performSemanticSearch()">Search with AI</button>
+            </div>
+        </div>
+
+        <div id="resultsContainer">
+            {% if results %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Filename</th>
+                            <th>File Date</th>
+                            <th>Detected Objects</th>
+                            <th>Detected Faces</th>
+                            <th>Detected Text</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        {% for row in results %}
+                        <tr>
+                            <td>{{ row.id }}</td>
+                            <td>{{ row.filename }}</td>
+                            <td>{{ row.file_date }}</td>
+                            <td>{{ row.detected_objects }}</td>
+                            <td>{{ row.has_faces }}</td>
+                            <td>
+                                {% if row.detected_text %}
+                                    <a href="#" class="btn" onclick="showFullText({{ row.id }})">View Text</a>
+                                {% else %}
+                                    No text
+                                {% endif %}
+                            </td>
+                            <td>
+                                <!--<a href="#" class="btn" onclick="showPhoto('{{ row.filename }}')">View Photo</a> -->
+                                <a href="#" class="btn" onclick="downloadPhoto('{{ row.filename }}'); return false;">Download Photo</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="pagination" style="text-align:center; margin-top:20px;">
+                    <button onclick="prevPage()" id="prevBtn" disabled>Назад</button>
+                    <span id="pageInfo" style="margin: 0 10px; font-weight: 500; color: #1976D2;">Страница 1</span>
+                    <button onclick="nextPage()" id="nextBtn">Вперёд</button>
+                </div>
+            {% else %}
+                <div class="no-results">
+                    No results found.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Модальные окна остаются без изменений -->
+    <div id="textModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Detected Text</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div id="modalTextContent"></div>
+        </div>
+    </div>
+
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Photo Preview</h2>
+                <span class="close-photo">&times;</span>
+            </div>
+            <img id="modalPhoto" src="" alt="Photo">
+        </div>
+    </div>
+
+    <!-- JavaScript код остается без изменений -->
+    <script>
+        // Получаем модальное окно
+        var modal = document.getElementById("textModal");
+
+        // Получаем элемент <span>, который закрывает модальное окно
+        var span = document.getElementsByClassName("close")[0];
+
+        // Получаем содержимое модального окна
+        var modalContent = document.getElementById("modalTextContent");
+
+        // Функция для отображения полного текста
+        function showFullText(id) {
+            fetch(`/api/full_text/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.text) {
+                        modalContent.textContent = data.text;
+                        modal.style.display = "block";
+                    } else {
+                        alert("Text not found.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching full text:", error);
+                    alert("Error fetching text. Please try again.");
+                });
+        }
+
+        // Когда пользователь нажимает на <span> (x), закрыть модальное окно
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // Когда пользователь щелкает в любом месте за пределами модального окна, закрыть его
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        var photoModal = document.getElementById("photoModal");
+        var photoSpan = document.getElementsByClassName("close-photo")[0];
+        var modalPhoto = document.getElementById("modalPhoto");
+
+        function showPhoto(filename) {
+            const cloudName = "djvs5vwfl";
+            const version = "v1747089158"; // <-- обязательно!
+            // filename уже содержит .jpg, Cloudinary добавляет еще .jpg           
+            const photoUrl = `https://res.cloudinary.com/${cloudName}/image/upload/${version}/${encodeURIComponent(filename)}.jpg`;
+            console.log("Cloudinary URL:", photoUrl); // <-- добавьте это!
+            modalPhoto.src = photoUrl;
+            modalPhoto.onload = function() {
+                photoModal.style.display = "block";
+            };
+            modalPhoto.onerror = function() {
+                alert("Error loading image. Please try again.");
+                photoModal.style.display = "none";
+            };
+        }
+
+        function downloadPhoto(filename) {
+            const cloudName = "djvs5vwfl";
+            const version = "v1747089158";
+            // fl_attachment без имени — Cloudinary сам подставит имя файла
+            const photoUrl = `https://res.cloudinary.com/${cloudName}/image/upload/fl_attachment/${version}/${encodeURIComponent(filename)}.jpg`;
+
+            const link = document.createElement('a');
+            link.href = photoUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        photoSpan.onclick = function() {
+            photoModal.style.display = "none";
+            modalPhoto.src = "";
+        }
+
+
+        window.onclick = function(event) {
+            if (event.target == photoModal) {
+                photoModal.style.display = "none";
+                modalPhoto.src = "";
+            }
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        let currentOffset = 0;
+        const pageSize = 20;
+        let lastResultsCount = 0;
+        let totalResults = 0;
+        let lastQuery = '';
+        let currentMode = '';
+
+        function renderTableAndPagination(results, total) {
+            const page = Math.floor(currentOffset / pageSize) + 1;
+            const totalPages = Math.max(1, Math.ceil(total / pageSize));
+            const tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Filename</th>
+                            <th>File Date</th>
+                            <th>Detected Objects</th>
+                            <th>Detected Faces</th>
+                            <th>Detected Text</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        ${results.map(result => `
+                            <tr>
+                                <td>${result.id}</td>
+                                <td>${result.filename}</td>
+                                <td>${result.file_date}</td>
+                                <td>${result.detected_objects || ''}</td>
+                                <td>${result.has_faces ? 'Yes' : 'No'}</td>
+                                <td>
+                                    ${result.detected_text ? 
+                                        `<a href=\"#\" class=\"btn\" onclick=\"showFullText(${result.id})\">View Text</a>` : 
+                                        'No text'}
+                                </td>
+                                <td>
+                                    <a href="#" class="btn" onclick="showPhoto('${result.filename}')">View Photo</a>
+                                    <a href="#" class="btn" onclick="downloadPhoto('${result.filename}'); return false;">Download Photo</a>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <div class="pagination" style="text-align:center; margin-top:20px;">
+                    <button onclick="prevPage()" id="prevBtn" ${currentOffset === 0 ? 'disabled' : ''}>Back</button>
+                    <span id="pageInfo" style="margin: 0 10px; font-weight: 500; color: #1976D2;">Number ${page} from ${totalPages} (${total} results)</span>
+                    <button onclick="nextPage()" id="nextBtn" ${results.length < pageSize ? 'disabled' : ''}>Forward</button>
+                </div>
+            `;
+            document.getElementById('resultsContainer').innerHTML = tableHTML;
+        }
+
+        async function performKeywordSearch(offset = 0) {
+            currentMode = 'keyword';
+            const keyword = document.getElementById('keywordSearch').value;
+            if (!keyword) return;
+            lastQuery = keyword;
+            try {
+                const response = await fetch(`/api/keyword-search/?keyword=${encodeURIComponent(keyword)}&offset=${offset}&limit=${pageSize}`);
+                const data = await response.json();
+                if (data.results) {
+                    currentOffset = offset;
+                    lastResultsCount = data.results.length;
+                    totalResults = data.total || (offset + data.results.length + (data.results.length === pageSize ? pageSize : 0));
+                    renderTableAndPagination(data.results, totalResults);
+                }
+            } catch (error) {
+                console.error('Error performing keyword search:', error);
+            }
+        }
+
+        async function performSemanticSearch(offset = 0) {
+            currentMode = 'semantic';
+            const query = document.getElementById('semanticSearch').value;
+            if (!query) return;
+            lastQuery = query;
+            try {
+                const response = await fetch('/api/semantic-search/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query, top_k: pageSize, offset: offset })
+                });
+                const data = await response.json();
+                if (data.results) {
+                    currentOffset = offset;
+                    lastResultsCount = data.results.length;
+                    totalResults = data.total || (offset + data.results.length + (data.results.length === pageSize ? pageSize : 0));
+                    renderTableAndPagination(data.results, totalResults);
+                }
+            } catch (error) {
+                console.error('Error performing semantic search:', error);
+            }
+        }
+
+        function nextPage() {
+            if (lastResultsCount === pageSize) {
+                if (currentMode === 'semantic') performSemanticSearch(currentOffset + pageSize);
+                else performKeywordSearch(currentOffset + pageSize);
+            }
+        }
+
+        function prevPage() {
+            if (currentOffset - pageSize >= 0) {
+                if (currentMode === 'semantic') performSemanticSearch(currentOffset - pageSize);
+                else performKeywordSearch(currentOffset - pageSize);
+            }
+        }
+
+        // Аналитика: отправка событий поиска на сервер (шаблон)
+        function sendAnalytics(mode, query, faces, objects, sort, count) {
+            fetch('/api/analytics/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mode, query, faces, objects, sort, count, timestamp: new Date().toISOString(), page: Math.floor(currentOffset / pageSize) + 1
+                })
+            });
+        }
+    </script>
+</body>
+</html>

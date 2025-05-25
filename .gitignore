@@ -1,0 +1,12 @@
+
+__pycache__/
+*.pyc
+
+
+embeddings_cache.pkl
+FinalSiteBouchard/embeddings_cache.pkl
+
+venv/
+.env
+
+*.log
